@@ -1,0 +1,78 @@
+.login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: #f9f9f9; /* Light background for better contrast */
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Add shadow for depth */
+    border-radius: 10px; /* Rounded corners */
+}
+
+.logo-container {
+    margin-bottom: 20px;
+}
+
+.logo {
+    width: 100px; /* Adjust size as needed */
+}
+
+h2 {
+    color: #333; /* Darker text for better readability */
+    margin-bottom: 20px; /* Space between title and form */
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    width: 100%; /* Full width for mobile */
+    max-width: 400px; /* Max width for larger screens */
+}
+
+input {
+    margin: 10px 0;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    transition: border-color 0.3s; /* Smooth transition for focus */
+}
+
+input:focus {
+    border-color: #28a745; /* Change border color on focus */
+    outline: none; /* Remove default outline */
+}
+
+button {
+    padding: 10px;
+    background-color: #28a745; /* Green button */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s; /* Smooth transition */
+}
+
+button:hover {
+    background-color: #218838; /* Darker green on hover */
+}
+
+p {
+    margin-top: 10px;
+    color: red; /* Error message color */
+}
+
+/* Media Queries for Responsiveness */
+@media (max-width: 600px) {
+    .login-container {
+        padding: 10px; /* Reduce padding on smaller screens */
+    }
+
+    .logo {
+        width: 80px; /* Smaller logo on mobile */
+    }
+
+    form {
+        width: 90%; /* Full width on mobile */
+    }
+} 
