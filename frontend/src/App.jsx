@@ -4,6 +4,8 @@ import Dashboard from './pages/Dashboard';
 import List from './pages/List';
 import About from './pages/About';
 import './assets/css/App.css';
+import './assets/css/theme.css';
+import './assets/css/shared.css';
 
 function App() {
     return (

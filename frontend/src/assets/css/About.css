@@ -1,0 +1,153 @@
+/* Base styles */
+.about-page {
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    background-color: #f8fafc;
+    overflow-y: scroll;
+    height: 100vh;
+}
+
+/* Make about content scrollable */
+.about-page .about-content {
+    flex: 1;
+    padding: 2rem 2.5rem;
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    position: relative;
+}
+
+/* About Container */
+.about-page .about-container {
+    padding-bottom: 2rem;
+    padding-right: 16px;
+}
+
+/* Customize scrollbar appearance */
+.about-page::-webkit-scrollbar {
+    width: 8px;
+}
+
+.about-page::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.about-page::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.about-page::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* About Container - Update these styles */
+.about-page .about-container h1 {
+    color: #1e293b;
+    font-size: 1.875rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+}
+
+/* About Card */
+.about-page .about-card {
+    background: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    margin-bottom: 2.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.about-page .about-card h2 {
+    color: #1e293b;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.about-page .about-card p {
+    color: #64748b;
+    line-height: 1.6;
+}
+
+/* Features Grid */
+.about-page .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.about-page .feature-card {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.about-page .feature-icon {
+    font-size: 2rem;
+    color: #6366f1;
+    margin-bottom: 1rem;
+}
+
+.about-page .feature-card h3 {
+    color: #1e293b;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.about-page .feature-card p {
+    color: #64748b;
+    line-height: 1.5;
+}
+
+/* Contact Support Section */
+.about-page .contact-support {
+    background: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    margin-top: 2.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.about-page .contact-support h2 {
+    color: #1e293b;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.about-page .contact-support p {
+    color: #64748b;
+    margin-bottom: 1rem;
+    line-height: 1.6;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .about-page .about-content {
+        padding: 1.5rem;
+    }
+
+    .about-page .about-card,
+    .about-page .contact-support {
+        padding: 1.5rem;
+    }
+
+    .about-page .features-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .footer-content {
+        grid-template-columns: 1fr;
+        padding: 0 1.5rem;
+    }
+} 
