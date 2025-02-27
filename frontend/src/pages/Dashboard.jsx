@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import { Bar, Pie } from 'react-chartjs-2';
 import { Document, Page, Text, View, StyleSheet, PDFDownloadLink } from '@react-pdf/renderer';
+import axios from 'axios';
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -27,21 +28,31 @@ ChartJS.register(
     Legend
 );
 
-// Update the PDF styles to include table styling
+// Define PDF styles
 const styles = StyleSheet.create({
     page: {
         flexDirection: 'column',
         backgroundColor: '#ffffff',
-        padding: 30
+        padding: 30,
+        fontSize: 12,
+    },
+    header: {
+        marginBottom: 20,
+        textAlign: 'center',
+    },
+    headerText: {
+        fontSize: 16,
+        fontWeight: 'bold',
     },
     section: {
         margin: 10,
         padding: 10,
+        flexGrow: 1,
     },
     title: {
         fontSize: 24,
         marginBottom: 20,
-        textAlign: 'center'
+        textAlign: 'center',
     },
     table: {
         display: 'table',
@@ -50,9 +61,11 @@ const styles = StyleSheet.create({
         borderStyle: 'solid',
         borderWidth: 1,
         borderColor: '#bfbfbf',
+        flexGrow: 1,
     },
     tableRow: {
         flexDirection: 'row',
+        flexWrap: 'nowrap',
     },
     tableHeader: {
         backgroundColor: '#f0f0f0',
@@ -63,6 +76,7 @@ const styles = StyleSheet.create({
         borderStyle: 'solid',
         borderWidth: 1,
         borderColor: '#bfbfbf',
+        flexGrow: 1,
     },
     headerCell: {
         width: '25%',
@@ -72,44 +86,69 @@ const styles = StyleSheet.create({
     cell: {
         width: '25%',
         fontSize: 10,
-    }
+    },
+    footer: {
+        position: 'absolute',
+        bottom: 30,
+        left: 0,
+        right: 0,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingHorizontal: 30,
+    },
+    footerTextLeft: {
+        fontSize: 10,
+    },
+    footerTextRight: {
+        fontSize: 10,
+    },
 });
 
 // Update the PDF Document component
-const MyDocument = ({ data }) => (
-    <Document>
-        <Page size="A4" style={styles.page}>
-            <View style={styles.section}>
-                <Text style={styles.title}>Device Report</Text>
-                
-                {/* Table Header */}
-                <View style={[styles.tableRow, styles.tableHeader]}>
-                    <Text style={[styles.tableCell, styles.headerCell]}>Serial Number</Text>
-                    <Text style={[styles.tableCell, styles.headerCell]}>IMEI</Text>
-                    <Text style={[styles.tableCell, styles.headerCell]}>Last Connection</Text>
-                    <Text style={[styles.tableCell, styles.headerCell]}>Status</Text>
-                </View>
+const MyDocument = ({ data }) => {
+    const totalPages = Math.ceil(data.length / 20); // Adjust the number of rows per page as needed
 
-                {/* Table Body */}
-                {data.map((device, index) => (
-                    <View style={styles.tableRow} key={index}>
-                        <Text style={[styles.tableCell, styles.cell]}>{device.serialNumber}</Text>
-                        <Text style={[styles.tableCell, styles.cell]}>{device.imei}</Text>
-                        <Text style={[styles.tableCell, styles.cell]}>
-                            {new Date(device.lastConnection).toLocaleString()}
-                        </Text>
-                        <Text style={[styles.tableCell, styles.cell]}>
-                            {device.status.toUpperCase()}
-                        </Text>
+    return (
+        <Document>
+            {Array.from({ length: totalPages }).map((_, pageIndex) => (
+                <Page size="A4" style={styles.page} key={pageIndex}>
+                    <View style={styles.header}>
+                        <Text style={styles.headerText}>Smart Crib Device Connection Report</Text>
                     </View>
-                ))}
-            </View>
-        </Page>
-    </Document>
-);
+
+                    <View style={styles.section}>
+                        <View style={[styles.tableRow, styles.tableHeader]}>
+                            <Text style={[styles.tableCell, styles.headerCell]}>QRCode</Text>
+                            <Text style={[styles.tableCell, styles.headerCell]}>Serial Number</Text>
+                            <Text style={[styles.tableCell, styles.headerCell]}>IMEI</Text>
+                            <Text style={[styles.tableCell, styles.headerCell]}>Created At</Text>
+                        </View>
+
+                        {data.slice(pageIndex * 20, (pageIndex + 1) * 20).map((device, index) => (
+                            <View style={styles.tableRow} key={index} wrap={false}>
+                                <Text style={[styles.tableCell, styles.cell]}>{device.QRCode}</Text>
+                                <Text style={[styles.tableCell, styles.cell]}>{device.SerialNumber}</Text>
+                                <Text style={[styles.tableCell, styles.cell]}>{device.IMEI}</Text>
+                                <Text style={[styles.tableCell, styles.cell]}>
+                                    {new Date(device.CreatedAt).toLocaleString()}
+                                </Text>
+                            </View>
+                        ))}
+                    </View>
+
+                    <View style={styles.footer}>
+                        <Text style={styles.footerTextLeft}>Smart Baby Crib</Text>
+                        <Text style={styles.footerTextRight} render={({ pageNumber }) => `${pageNumber} / ${totalPages}`} />
+                    </View>
+                </Page>
+            ))}
+        </Document>
+    );
+};
 
 const Dashboard = () => {
-    const barChartData = {
+    const [devices, setDevices] = useState([]);
+    const [barChartData, setBarChartData] = useState({
         labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
         datasets: [
             {
@@ -126,55 +165,20 @@ const Dashboard = () => {
                 ]
             }
         ]
-    };
+    });
 
-    const pieChartData = {
-        labels: ['Active', 'Inactive'],
-        datasets: [
-            {
-                data: [65, 35],
-                backgroundColor: ['#4CAF50', '#ff9800'],
-                borderWidth: 0
-            }
-        ]
-    };
-
-    const barChartOptions = {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                position: 'top'
-            }
+    const fetchDevices = async () => {
+        try {
+            const response = await axios.get('http://localhost:3000/api/devices'); // Adjust the URL as needed
+            setDevices(response.data);
+        } catch (error) {
+            console.error('Error fetching devices:', error);
         }
     };
 
-    const pieChartOptions = {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                position: 'top'
-            }
-        }
-    };
-
-    // Sample data for the report
-    const reportData = [
-        {
-            serialNumber: 'SCB001',
-            imei: '354857095625801',
-            lastConnection: '2024-03-20T14:25:00',
-            status: 'active'
-        },
-        {
-            serialNumber: 'SCB002',
-            imei: '354857095625802',
-            lastConnection: '2024-03-20T09:45:00',
-            status: 'active'
-        },
-        // ... more data
-    ];
+    useEffect(() => {
+        fetchDevices();
+    }, []);
 
     return (
         <div className="dashboard">
@@ -183,7 +187,7 @@ const Dashboard = () => {
                 <div className="dashboard-header">
                     <h2>Dashboard Overview</h2>
                     <PDFDownloadLink
-                        document={<MyDocument data={reportData} />}
+                        document={<MyDocument data={devices} />}
                         fileName={`device_report_${new Date().toISOString().split('T')[0]}.pdf`}
                         className="generate-report-btn"
                         style={{ textDecoration: 'none' }}
@@ -209,10 +213,10 @@ const Dashboard = () => {
                             </div>
                         </div>
                         <div className="chart-wrapper">
-                            <Bar data={barChartData} options={barChartOptions} />
+                            <Bar data={barChartData} options={{ responsive: true, maintainAspectRatio: false }} />
                         </div>
                     </div>
-                    
+
                     <div className="chart-container pie-chart-container">
                         <div className="chart-header">
                             <h2>User Status Distribution</h2>
@@ -228,7 +232,7 @@ const Dashboard = () => {
                             </div>
                         </div>
                         <div className="chart-wrapper">
-                            <Pie data={pieChartData} options={pieChartOptions} />
+                            <Pie data={{ labels: ['Active', 'Inactive'], datasets: [{ data: [65, 35], backgroundColor: ['#4CAF50', '#ff9800'], borderWidth: 0 }] }} options={{ responsive: true, maintainAspectRatio: false }} />
                         </div>
                     </div>
                 </div>

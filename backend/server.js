@@ -1,8 +1,10 @@
-require('dotenv').config(); // Load environment variables from .env file
-const express = require('express');
+require('dotenv').config();
 const cors = require('cors');
 const connectDB = require('./config/dbConfig');
 const userRoutes = require('./routes/userRoutes');
+const deviceRoutes = require('./routes/deviceRoutes');
+const reportRoutes = require('./routes/reportRoutes');
+const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -12,15 +14,10 @@ app.use(express.json());
 // Connect to MongoDB
 connectDB();
 
-// Use user routes
+// Use routes
 app.use('/api', userRoutes);
-
-// Example login route
-app.post('/api/login', (req, res) => {
-    const { email, password } = req.body;
-    // Implement your authentication logic here
-    res.json({ token: 'your_token_here' });
-});
+app.use('/api', deviceRoutes);
+app.use('/api', reportRoutes);
 
 // Start the server
 app.listen(PORT, () => {
